@@ -3,7 +3,8 @@ import os
 import re
 
 terms_file = "terms_map.json"
-kb_folder = "knowledge_base"
+source_folder = "source_base"
+target_folder = "knowledge_base"
 
 with open(terms_file, "r", encoding="utf-8") as f:
     terms_map = json.load(f)
@@ -15,9 +16,9 @@ def replace_match(match, replacement):
     else:
         return replacement.lower()
 
-for filename in os.listdir(kb_folder):
+for filename in os.listdir(source_folder):
     if filename.endswith(".txt"):
-        file_path = os.path.join(kb_folder, filename)
+        file_path = os.path.join(source_folder, filename)
 
         with open(file_path, "r", encoding="utf-8") as f:
             content = f.read()
@@ -26,6 +27,6 @@ for filename in os.listdir(kb_folder):
             pattern = re.compile(re.escape(old), re.IGNORECASE)
             content = pattern.sub(lambda m: replace_match(m, new), content)
 
-        # Сохраняем обратно
-        with open(file_path, "w", encoding="utf-8") as f:
+        target_path = os.path.join(target_folder, filename)
+        with open(target_path, "w", encoding="utf-8") as f:
             f.write(content)
