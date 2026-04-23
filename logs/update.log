@@ -1,0 +1,8 @@
+2026-04-17 11:16:21,333 | INFO | Start update index
+2026-04-17 11:16:21,334 | INFO | New file detected: prorok.txt
+2026-04-17 11:16:21,334 | INFO | Chunks created: 4
+2026-04-17 11:16:21,351 | INFO | No device provided, using mps
+2026-04-17 11:16:23,211 | WARNING | Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+2026-04-17 11:16:23,501 | INFO | Loading SentenceTransformer model from intfloat/multilingual-e5-base.
+2026-04-17 11:16:31,350 | INFO | prorok.txt was processed
+2026-04-17 11:16:31,350 | INFO | Index updated successfully.

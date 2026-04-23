@@ -1,0 +1,55 @@
+@startuml
+title Тестирование и оценка RAG-системы (Golden Questions)
+
+autonumber
+skinparam Style strictuml
+skinparam MaxMessageSize 200
+
+actor "QA / Developer" as Tester
+participant "test_script.py" as Script
+entity "golden_questions.txt" as Data
+control "rag_bot.ask_rag" as RAG
+database "ChromaDB" as Chroma
+entity "LLM" as LLM
+collections "Embedding Model\n(e5-base)" as Emb
+entity "logs.jsonl" as Log
+
+== 1. Подготовка ==
+Tester -> Script : Запуск run_tests()
+activate Script
+
+Script -> Data : load_questions()
+Data --> Script : Список [Вопрос, Ожидаемый ответ]
+
+== 2. Обработка запроса (ask_rag) ==
+loop Для каждого тестового вопроса
+    Script -> RAG : ask_rag(question)
+    activate RAG
+
+    RAG -> Chroma : Поиск документов (Similarity Search)
+    Chroma --> RAG : docs (chunks + metadata)
+
+    RAG -> LLM : Генерация ответа (Prompt + docs)
+    LLM --> RAG : Сгенерированный ответ (answer)
+
+    RAG --> Script : answer, docs
+    deactivate RAG
+
+== 3. Процесс оценки (Evaluation) ==
+    Script -> Emb : embed_query(answer)
+    Emb --> Script : вектор A
+    Script -> Emb : embed_query(expected)
+    Emb --> Script : вектор B
+
+    Script -> Script : similarity(A, B)\n(Cosine Similarity via np.dot)
+
+    Script -> Script : Проверка условий:\n1. "я не знаю" NOT IN answer\n2. similarity > 0.8
+
+    Script -> Log : log(result, timestamp)
+    note right: Сохранение метаданных,\nчанков и скора
+end
+
+Script --> Tester : Завершение тестов
+deactivate Script
+
+@enduml

@@ -1,0 +1,6 @@
+Установка зависимостей:
+source .venv/bin/activate
+pip install langchain langchain-huggingface langchain-community langchain-text-splitters
+pip install chromadb
+pip install sentence-transformers
+pip install transformers accelerate

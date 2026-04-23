@@ -1,0 +1,49 @@
+@startuml
+title Ежедневная обработка документов (22:00)
+
+autonumber
+skinparam Style strictuml
+skinparam MaxMessageSize 150
+
+boundary "Cron Job" as Cron
+control "Processing Script" as Script
+entity "Local Folder\n/docs/*.txt" as Disk
+collections "multilingual-e5-base" as Model
+database "ChromaDB\n(chroma_index)" as DB
+entity "Logs\n(logs/update.log)" as Logs
+
+Cron -> Script : Запуск в 22:00
+activate Script
+
+Script -> Disk : Поиск .txt файлов
+activate Disk
+Disk --> Script : Список файлов
+deactivate Disk
+
+loop Для каждого файла
+    Script -> Logs : Запись: "Начало обработки [filename]"
+
+    Script -> Disk : Чтение контента файла
+    Disk --> Script : Текстовые данные
+
+    Script -> Script : Разбивка на чанки (Chunking)
+
+    Script -> Model : Отправка чанков для создания Embedding
+    activate Model
+    Model --> Script : Векторные представления
+    deactivate Model
+
+    Script -> DB : Сохранение эмбеддингов в 'chroma_index'
+    activate DB
+    DB --> Script : ok
+    deactivate DB
+
+    Script -> Disk : Переименование .txt -> .processed
+
+    Script -> Logs : Запись: "Успешно обработан [filename]"
+end
+
+Script -> Logs : Запись: "Задача завершена"
+deactivate Script
+
+@enduml
